@@ -16,6 +16,9 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
   ## Return the mean of the pollutant across all monitors list
   ## in the 'id' vector (ignoring NA values)
   
+  directory <- "specdata"
+  id <- 1:10
+  
   for (i in id) {
     if (exists("x")) {
       x <- rbind(x, read.csv(paste(directory,"/",sprintf("%03d", i),".csv", sep = ""), header=T))
@@ -24,8 +27,8 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
     } 
   }
   
-  mean(x$pollutant, na.rm = T)
+  mean(x[[pollutant]], na.rm = T)
 }
 
 # script to submit code for grading
-source("http://d396qusza40orc.cloudfront.net/rprog%2Fscripts%2Fsubmitscript1.R")
+#source("http://d396qusza40orc.cloudfront.net/rprog%2Fscripts%2Fsubmitscript1.R")
