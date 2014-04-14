@@ -38,5 +38,3 @@ complete <- function(directory, id = 1:332) {
 }
 
 
-# script to submit code for grading
-source("http://d396qusza40orc.cloudfront.net/rprog%2Fscripts%2Fsubmitscript1.R")
