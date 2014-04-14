@@ -6,7 +6,6 @@
 complete <- function(directory, id = 1:332) {
   ## 'directory' is a character vector of length 1 indicating
   ## the location of the CSV files
-  setwd("~/Documents/kaggle/datasciencecoursera/R_Programming/Week2")
   
   ## 'id' is an integer vector indicating the monitor ID numbers
   ## to be used
@@ -18,6 +17,24 @@ complete <- function(directory, id = 1:332) {
   ## ...
   ## where 'id' is the monitor ID number and 'nobs' is the
   ## number of complete cases
+  
+  for (i in id) {
+    if (exists("y")) {
+      x <- read.csv(paste(directory, "/", sprintf("%03d", i), ".csv", sep = ""), header=T)
+      x <- complete.cases(x)
+      y <- rbind(y, c("id" = i,"nobs" = sum(x)))
+      row.names(y)  <- 1:nrow(y) 
+    } else {
+      x <- read.csv(paste(directory, "/", sprintf("%03d", i), ".csv", sep = ""), header=T)
+      x <- complete.cases(x)
+      y <- c("id" = i,"nobs" = sum(x))
+      dim(y) <- c(1,2)
+      colnames(y) <- c("id","nobs") 
+      row.names(y)  <- 1
+    } 
+  }
+  y <- data.frame(y)
+  y
 }
 
 
