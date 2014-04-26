@@ -95,6 +95,6 @@ dataMelt <- melt(dataset,id=c("Subject","Activity"),measure.vars=ncols)
 
 tidydata <- dcast(dataMelt, Subject + Activity ~ variable,mean)
 
-write.table(tidydata, file="tidydata.csv", col.names=T, row.names=F, sep=",")
+write.table(tidydata, file="tidydata.txt", col.names=T, row.names=F, sep=",")
 
 rm(list=c("dataMelt","cols","ncols"))
