@@ -82,16 +82,19 @@ rownames(dataset) <- NULL
 
 rm(list=c("tmp","colnm","activity_labels"))
 
-
+# write final dataset to output file
+write.table(dataset, file="dataset.csv", col.names=T, row.names=F, sep=",")
 
 ##     5. Creates a second, independent tidy data set with the average of each 
 ##        variable for each activity and each subject. 
+library(reshape2)
 
+cols <- colnames(dataset)
+ncols <- cols[-c(1:2)]
+dataMelt <- melt(dataset,id=c("Subject","Activity"),measure.vars=ncols)
 
+tidydata <- dcast(dataMelt, Subject + Activity ~ variable,mean)
 
+write.table(tidydata, file="tidydata.csv", col.names=T, row.names=F, sep=",")
 
-
-
-
-
-
+rm(list=c("dataMelt","cols","ncols"))
