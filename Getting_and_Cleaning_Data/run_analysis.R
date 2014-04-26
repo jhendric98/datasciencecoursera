@@ -7,55 +7,88 @@
 
 
 
-#     1. Merges the training and the test sets to create one data set.
+##    1. Merges the training and the test sets to create one data set.
+
+# load all datasets
 X_test <- read.table("UCI HAR Dataset/test/X_test.txt", quote="\"")
 y_test <- read.table("UCI HAR Dataset/test/y_test.txt", quote="\"")
 sub_test <- read.table("UCI HAR Dataset/test/subject_test.txt", quote="\"")
-
 X_train <- read.table("UCI HAR Dataset/train/X_train.txt", quote="\"")
 y_train <- read.table("UCI HAR Dataset/train/y_train.txt", quote="\"")
 sub_train <- read.table("UCI HAR Dataset/train/subject_train.txt", quote="\"")
-
-
+activity_labels <- read.table("UCI HAR Dataset/activity_labels.txt", quote="\"")
 features <- read.table("UCI HAR Dataset/features.txt", quote="\"")
 
+# add real column names to each dataset
 colnames(X_test) <- features$V2
 colnames(X_train) <- features$V2
 
-dataset <- rbind(X_test,X_train)
-labels <- rbind(y_test,y_train)
-subjects <- rbind(sub_test,sub_train)
+# add the activity labels to each dataset
+test <- cbind(y_test,X_test)
+train <- cbind(y_train,X_train)
 
-dataset$labels <- labels$V1
+# rename the activity labels
+names(test)[1] <- "ActivityLabel"
+names(train)[1] <- "ActivityLabel"
 
+# add test subject ids to test and train
+test <- cbind(sub_test,test)
+train <- cbind(sub_train,train)
 
+# rename the activity labels
+names(test)[1] <- "Subject"
+names(train)[1] <- "Subject"
 
+# final dateset join
+dataset <- rbind(test,train)
 
-rm(X_test)
-rm(X_train)
-rm(y_test)
-rm(y_train)
+##     2. Extracts only the measurements on the mean and standard deviation for each measurement. 
 
-#     2. Extracts only the measurements on the mean and standard deviation for each measurement. 
-
+# use regex to extract the col numbers of columns with only mean() and std()
 index <- with(features, grepl("std()",V2))
 index2 <- with(features, grepl("mean()",V2))
+
+# join the column sets and add the subject and activity columns
 cols <- features[index | index2, "V1"]
+tmp <- cols + 2
+tmp2 <- c(1,2,tmp)
 
-dataset <- dataset[,cols]
+# filter the dataset by the index to keep only the cols we want
+dataset <- dataset[,tmp2]
 
-#labels <- labels(,"V2")
-dataset <- cbind(labels, dataset)
-names(dataset)[1] <- "Activity"
+# cleanup memory
+rm(list=c("cols","index","index2","tmp","tmp2","test",
+          "train","X_test","X_train","y_test","y_train",
+          "sub_train","sub_test","features"))
 
-dataset <- cbind(subjects, dataset)
-names(dataset)[1] <- "Subjects"
 
-rm(cols)
-rm(index)
-rm(index2)
+##     3. Uses descriptive activity names to name the activities in the data set
+##     4. Appropriately labels the data set with descriptive activity names.
+#  Note: tasks 3 and 4 really seem to be the same task.
 
-#     5. Creates a second, independent tidy data set with the average of each variable for each activity and each subject. 
+# for this we  need to decode the activity names using the activity_labels data.frame
+names(activity_labels)[1] = "ActivityLabel"
+names(activity_labels)[2] = "Activity"
+tmp <- merge(x = dataset, y = activity_labels, by="ActivityLabel", all.x=TRUE )
+
+colnm <- colnames(dataset)
+colnm[2] <- "Activity"
+
+dataset <- tmp[colnm]
+
+dataset <- dataset[order(dataset[,"Subject"],dataset[,"Activity"]), ]
+
+rownames(dataset) <- NULL
+
+rm(list=c("tmp","colnm","activity_labels"))
+
+
+
+##     5. Creates a second, independent tidy data set with the average of each 
+##        variable for each activity and each subject. 
+
+
+
 
 
 
